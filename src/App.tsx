@@ -479,10 +479,8 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
   };
 
   const handleSuggestLabels = async () => {
-    if (!process.env.GEMINI_API_KEY) return;
     setIsAiLoading(true);
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const prompt = formData.type === 'atlas' 
         ? `I am creating a geographic atlas activity titled "${formData.title}". 
            Suggest 4 key historical or geographic coordinates relevant to this topic.
@@ -492,27 +490,18 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
            Suggest 4 key anatomical or mechanical parts to identify.
            Return ONLY a JSON array of objects with 'name', 'description' properties.`;
 
-      const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        contents: [{ text: prompt }],
-        config: {
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.ARRAY,
-            items: {
-              type: Type.OBJECT,
-              properties: {
-                name: { type: Type.STRING },
-                description: { type: Type.STRING },
-                lat: { type: Type.NUMBER },
-                lng: { type: Type.NUMBER }
-              }
-            }
-          }
-        }
+      const response = await fetch('/api/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt })
       });
 
-      const suggestions = JSON.parse(response.text || '[]');
+      if (!response.ok) {
+        throw new Error('Failed to generate suggestions');
+      }
+
+      const data = await response.json();
+      const suggestions = JSON.parse(data.result || '[]');
       const newMarkers = suggestions.map((s: any, idx: number) => ({
         id: generateId(),
         x: 40 + (idx * 5),
@@ -658,11 +647,11 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
                <label className="text-[10px] uppercase tracking-[0.2em] font-black text-[#5A5A40]/40">Insights List</label>
                <button 
                   onClick={handleSuggestLabels}
-                  disabled={isAiLoading || !process.env.GEMINI_API_KEY}
-                  className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#5A5A40] hover:text-black disabled:opacity-30 transition-all"
+                  disabled={isAiLoading}
+                  className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#5A5A40] hover:text-black disabled:opacity-30 transition-all cursor-pointer"
                >
                  {isAiLoading ? <RefreshCw size={14} className="animate-spin" /> : <Sparkles size={14} />}
-                 Curate with AI
+                 Auto-Suggest
                </button>
             </div>
             <div className="space-y-3">
@@ -768,25 +757,25 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
         <AnimatePresence>
           {activeMarker && (
             <motion.div
-              initial={{ x: 100, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: 100, opacity: 0 }}
-              className="absolute inset-x-4 bottom-4 lg:inset-auto lg:right-16 lg:top-16 lg:bottom-16 max-h-[50vh] lg:max-h-none lg:w-96 glass-premium border border-white/5 rounded-[2rem] lg:rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-6 lg:p-10 space-y-6 lg:space-y-8 z-50 flex flex-col bg-[#2C2C2E]/90 lg:bg-transparent"
+              initial={{ scale: 0.95, opacity: 0, x: '-50%', y: '-50%' }}
+              animate={{ scale: 1, opacity: 1, x: '-50%', y: '-50%' }}
+              exit={{ scale: 0.95, opacity: 0, x: '-50%', y: '-50%' }}
+              className="absolute top-1/2 left-1/2 w-[calc(100%-2rem)] md:w-[450px] max-h-[85vh] bg-[#F5F2ED] border border-[#5A5A40]/10 rounded-[2rem] shadow-2xl p-6 md:p-8 space-y-6 z-50 flex flex-col"
             >
-              <div className="flex justify-between items-center pb-4 lg:pb-6 border-b border-white/10 lg:border-white/5 shrink-0">
-                <h4 className="font-display italic font-bold text-2xl lg:text-3xl text-premium-gradient">Location #{formData.markers.indexOf(activeMarker) + 1}</h4>
-                <button onClick={() => setSelectedMarkerId(null)} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer">
+              <div className="flex justify-between items-center pb-4 border-b border-[#5A5A40]/10 shrink-0">
+                <h4 className="font-display italic font-bold text-2xl text-[#2C2C2E]">Location #{formData.markers.indexOf(activeMarker) + 1}</h4>
+                <button onClick={() => setSelectedMarkerId(null)} className="p-2 text-[#5A5A40]/50 hover:text-[#5A5A40] transition-colors cursor-pointer">
                    <XCircle size={24} />
                 </button>
               </div>
               
-              <div className="flex-1 overflow-y-auto space-y-6 lg:space-y-8 pr-2 custom-scrollbar">
+              <div className="flex-1 overflow-y-auto space-y-6 pr-2 custom-scrollbar">
                 <div>
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-black text-[#5A5A40] lg:text-[#F5F2ED] mb-2 block">Name / Label</label>
+                  <label className="text-[10px] uppercase tracking-[0.4em] font-black text-[#5A5A40] mb-2 block">Name / Label</label>
                   <input 
                     value={activeMarker.name}
                     onChange={e => updateMarker(activeMarker.id, { name: e.target.value })}
-                    className="w-full bg-white/10 border border-white/20 rounded-[1rem] lg:rounded-2xl px-4 lg:px-6 py-3 lg:py-4 font-display italic font-semibold text-white text-base lg:text-lg focus:ring-2 focus:ring-[#5A5A40] outline-none transition-all"
+                    className="w-full bg-white border border-[#5A5A40]/10 rounded-2xl px-5 py-3 font-display italic font-semibold text-[#2C2C2E] text-lg focus:ring-2 focus:ring-[#5A5A40] outline-none transition-all shadow-sm"
                     placeholder="e.g. Byzantine..."
                   />
                 </div>
@@ -795,7 +784,7 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
                   <textarea 
                     value={activeMarker.description}
                     onChange={e => updateMarker(activeMarker.id, { description: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-serif h-36 resize-none text-white/70 focus:ring-2 focus:ring-[#5A5A40] outline-none transition-all"
+                    className="w-full bg-white border border-[#5A5A40]/10 rounded-2xl px-5 py-4 text-sm font-serif h-32 resize-none text-[#2C2C2E]/80 focus:ring-2 focus:ring-[#5A5A40] outline-none transition-all shadow-sm"
                     placeholder="Provide a hint or description..."
                   />
                 </div>
@@ -804,16 +793,16 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
                   <textarea 
                     value={activeMarker.feedback}
                     onChange={e => updateMarker(activeMarker.id, { feedback: e.target.value })}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-serif h-36 resize-none text-white/70 focus:ring-2 focus:ring-[#5A5A40] outline-none transition-all"
+                    className="w-full bg-white border border-[#5A5A40]/10 rounded-2xl px-5 py-4 text-sm font-serif h-32 resize-none text-[#2C2C2E]/80 focus:ring-2 focus:ring-[#5A5A40] outline-none transition-all shadow-sm"
                     placeholder="What they learn upon discovery..."
                   />
                 </div>
               </div>
 
-              <div className="pt-6 border-t border-[#5A5A40]/10">
+              <div className="pt-4 border-t border-[#5A5A40]/10 mt-auto shrink-0">
                 <button 
                   onClick={() => deleteMarker(activeMarker.id)}
-                  className="w-full py-4 text-red-500 font-sans font-bold uppercase tracking-widest text-xs hover:bg-red-50 rounded-2xl transition-all cursor-pointer"
+                  className="w-full py-4 text-red-500 font-sans font-bold uppercase tracking-widest text-xs hover:bg-red-50 border border-transparent hover:border-red-100 rounded-2xl transition-all cursor-pointer"
                 >
                   Delete Location
                 </button>
@@ -995,11 +984,11 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
               className="w-full h-full flex flex-col lg:flex-row overflow-y-auto overflow-x-hidden lg:overflow-hidden custom-scrollbar"
             >
               {/* Map Section - Left/Center */}
-              <div className="flex-none lg:flex-1 relative bg-black flex items-center justify-center overflow-hidden h-[45vh] sm:h-[50vh] lg:h-auto shrink-0 border-b border-white/10 lg:border-b-0 lg:border-r">
+              <div className="flex-none lg:flex-1 relative bg-white flex items-center justify-center overflow-hidden h-[45vh] sm:h-[50vh] lg:h-auto shrink-0 border-b border-[#5A5A40]/10 lg:border-b-0 lg:border-r">
                 <div className="absolute inset-0 z-0 p-4 lg:p-8 flex items-center justify-center">
                   {quiz.type === 'atlas' ? (
-                    <MapContainer center={[30, 80]} zoom={4} zoomControl={false} className="w-full h-full rounded-[2rem] border-4 border-white/5 bg-[#141414] map-mode-dark">
-                      <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png" />
+                    <MapContainer center={[30, 80]} zoom={4} zoomControl={false} className="w-full h-full rounded-[2rem] border-4 border-white/5 bg-[#E8E5DF] map-mode-light">
+                      <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
                       {quiz.markers.map(m => (
                         m.lat !== undefined && m.lng !== undefined && (
                           <LeafletMarker 
@@ -1085,13 +1074,13 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
               </div>
 
               {/* Info Sidebar - Right */}
-              <div className="w-full lg:w-[420px] glass-premium lg:border-l border-white/5 p-6 md:p-10 flex flex-col gap-8 md:gap-10 shrink-0 bg-[#0A0A0B]/80 lg:bg-transparent lg:overflow-y-auto border-t lg:border-t-0 flex-none pb-12 lg:pb-10">
+              <div className="w-full lg:w-[420px] bg-[#F5F2ED] lg:border-l border-[#5A5A40]/10 p-6 md:p-10 flex flex-col gap-8 md:gap-10 shrink-0 lg:overflow-y-auto border-t lg:border-t-0 flex-none pb-12 lg:pb-10 z-10">
                 <div className="space-y-4 md:space-y-6">
-                   <p className="text-[#5A5A40] text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] md:tracking-[0.6em]">Find Location</p>
-                   <h3 className="text-4xl md:text-5xl font-display font-bold italic text-white leading-tight break-words text-premium-gradient">{currentMarker?.name}</h3>
+                   <p className="text-[#5A5A40]/50 text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] md:tracking-[0.6em]">Find Location</p>
+                   <h3 className="text-4xl md:text-5xl font-display font-bold italic text-[#2C2C2E] leading-tight break-words">{currentMarker?.name}</h3>
                    {currentMarker?.description && (
-                     <div className="text-white/50 text-lg md:text-xl font-serif italic flex items-start gap-3 md:gap-4 glass-premium p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border border-white/5">
-                       <HelpCircle className="text-indigo-400 mt-1 flex-shrink-0" size={20} />
+                     <div className="text-[#2C2C2E]/60 text-lg md:text-xl font-serif italic flex items-start gap-3 md:gap-4 bg-white p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border border-[#5A5A40]/10 shadow-sm">
+                       <HelpCircle className="text-[#5A5A40] mt-1 flex-shrink-0" size={20} />
                        <p className="leading-relaxed">{currentMarker.description}</p>
                      </div>
                    )}
@@ -1103,17 +1092,17 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
                       initial={{ y: 20, opacity: 0 }}
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: -20, opacity: 0 }}
-                      className={`space-y-6 p-6 rounded-[2rem] border ${isCorrect ? 'bg-green-500/10 border-green-500/20' : 'bg-red-500/10 border-red-500/20'}`}
+                      className={`space-y-6 p-6 rounded-[2rem] border ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}
                     >
                        <div>
-                          <p className={`font-display font-bold italic text-2xl mb-1 ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
+                          <p className={`font-display font-bold italic text-2xl mb-1 ${isCorrect ? 'text-green-700' : 'text-red-700'}`}>
                             {isCorrect ? 'Correct!' : 'Incorrect.'}
                           </p>
-                          <p className="text-white/50 text-sm italic leading-relaxed">{isCorrect ? (currentMarker.feedback || 'Great job finding this location.') : 'That is not the current target.'}</p>
+                          <p className={`${isCorrect ? 'text-green-600/80' : 'text-red-600/80'} text-sm italic leading-relaxed`}>{isCorrect ? (currentMarker.feedback || 'Great job finding this location.') : 'That is not the current target.'}</p>
                        </div>
                        <button
                          onClick={handleNext}
-                         className={`w-full py-4 rounded-2xl font-sans font-black uppercase tracking-widest text-xs transition-all active:scale-95 shadow-2xl cursor-pointer ${isCorrect ? 'bg-green-500 text-white shadow-green-500/20' : 'bg-red-500 text-white shadow-red-500/20'}`}
+                         className={`w-full py-4 rounded-2xl font-sans font-black uppercase tracking-widest text-xs transition-all active:scale-95 shadow-xl cursor-pointer ${isCorrect ? 'bg-green-600 text-white shadow-green-500/20' : 'bg-red-600 text-white shadow-red-500/20'}`}
                        >
                          {gameState.currentMarkerIndex >= shuffledMarkers.length - 1 ? 'Finish Game' : 'Proceed to Next'}
                        </button>
@@ -1121,14 +1110,14 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
                   )}
                 </AnimatePresence>
 
-                <div className="mt-auto pt-8 border-t border-white/5">
-                  <div className="flex justify-between text-[10px] uppercase font-bold tracking-widest text-white/20 mb-2">
+                <div className="mt-auto pt-8 border-t border-[#5A5A40]/10">
+                  <div className="flex justify-between text-[10px] uppercase font-bold tracking-widest text-[#5A5A40]/50 mb-2">
                     <span>Progress</span>
                     <span>{gameState.currentMarkerIndex} / {quiz.markers.length}</span>
                   </div>
-                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-1 w-full bg-[#5A5A40]/10 rounded-full overflow-hidden">
                     <div 
-                      className="h-full bg-indigo-500/50 transition-all duration-500" 
+                      className="h-full bg-[#5A5A40] transition-all duration-500" 
                       style={{ width: `${(gameState.currentMarkerIndex / quiz.markers.length) * 100}%` }} 
                     />
                   </div>
@@ -1142,29 +1131,29 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
               key="end"
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
-              className="z-50 text-center glass-premium p-6 sm:p-10 md:p-16 rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-white/5 max-w-2xl w-[90%] sm:w-full mx-auto my-auto relative overflow-hidden"
+              className="z-50 text-center bg-white p-6 sm:p-10 md:p-16 rounded-[2rem] sm:rounded-[3rem] md:rounded-[4rem] shadow-2xl border border-[#5A5A40]/10 max-w-2xl w-[90%] sm:w-full mx-auto my-auto relative overflow-hidden"
             >
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#5A5A40] to-transparent opacity-30" />
                 
-                <div className={`w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full mx-auto flex items-center justify-center mb-6 sm:mb-10 shadow-2xl ${gameState.status === 'success' ? 'bg-[#5A5A40] text-white' : 'bg-red-500 text-white'}`}>
-                  {gameState.status === 'success' ? <CheckCircle2 className="w-8 h-8 sm:w-16 sm:h-16 marker-premium-glow" /> : <XCircle className="w-8 h-8 sm:w-16 sm:h-16" />}
+                <div className={`w-16 h-16 sm:w-24 sm:h-24 md:w-32 md:h-32 rounded-full mx-auto flex items-center justify-center mb-6 sm:mb-10 shadow-xl ${gameState.status === 'success' ? 'bg-[#5A5A40] text-white' : 'bg-red-500 text-white'}`}>
+                  {gameState.status === 'success' ? <CheckCircle2 className="w-8 h-8 sm:w-16 sm:h-16" /> : <XCircle className="w-8 h-8 sm:w-16 sm:h-16" />}
                 </div>
                 
-                <h2 className="text-4xl sm:text-6xl md:text-8xl font-display font-bold italic mb-4 sm:mb-6 text-premium-gradient">
+                <h2 className="text-4xl sm:text-6xl md:text-8xl font-display font-bold italic mb-4 sm:mb-6 text-[#2C2C2E]">
                   {gameState.status === 'success' ? 'Success!' : 'Game Over.'}
                 </h2>
-                <p className="text-white/40 text-lg sm:text-2xl italic font-serif mb-8 sm:mb-12 px-4 sm:px-0">
+                <p className="text-[#2C2C2E]/60 text-lg sm:text-2xl italic font-serif mb-8 sm:mb-12 px-4 sm:px-0">
                   {gameState.status === 'success' ? `You correctly found all ${quiz.markers.length} locations.` : 'You have run out of lives.'}
                 </p>
 
               <div className="grid grid-cols-2 gap-4 sm:gap-10 mb-8 sm:mb-12">
-                <div className="text-center p-4 sm:p-8 glass-premium rounded-3xl sm:rounded-[2.5rem] border border-white/5">
-                   <p className="text-[8px] sm:text-[10px] text-[#5A5A40] uppercase font-black tracking-[0.2em] sm:tracking-[0.4em] mb-2">Score</p>
-                   <p className="font-mono text-3xl sm:text-5xl font-bold text-premium-gradient">{gameState.score}</p>
+                <div className="text-center p-4 sm:p-8 bg-[#F5F2ED] rounded-3xl sm:rounded-[2.5rem] border border-[#5A5A40]/10">
+                   <p className="text-[8px] sm:text-[10px] text-[#5A5A40]/50 uppercase font-black tracking-[0.2em] sm:tracking-[0.4em] mb-2">Score</p>
+                   <p className="font-mono text-3xl sm:text-5xl font-bold text-[#5A5A40]">{gameState.score}</p>
                 </div>
-                <div className="text-center p-4 sm:p-8 glass-premium rounded-3xl sm:rounded-[2.5rem] border border-white/5">
-                   <p className="text-[8px] sm:text-[10px] text-[#5A5A40] uppercase font-black tracking-[0.2em] sm:tracking-[0.4em] mb-2">Accuracy</p>
-                   <p className="font-mono text-3xl sm:text-5xl font-bold text-premium-gradient">
+                <div className="text-center p-4 sm:p-8 bg-[#F5F2ED] rounded-3xl sm:rounded-[2.5rem] border border-[#5A5A40]/10">
+                   <p className="text-[8px] sm:text-[10px] text-[#5A5A40]/50 uppercase font-black tracking-[0.2em] sm:tracking-[0.4em] mb-2">Accuracy</p>
+                   <p className="font-mono text-3xl sm:text-5xl font-bold text-[#5A5A40]">
                      {Math.round((gameState.score / (quiz.markers.length * 100)) * 100)}%
                    </p>
                 </div>
@@ -1173,13 +1162,13 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                 <button 
                   onClick={onBack} 
-                  className="flex-1 bg-white/5 border border-white/10 text-white/60 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] text-xs sm:text-sm font-sans font-black uppercase tracking-[0.3em] hover:bg-white/10 transition-all cursor-pointer"
+                  className="flex-1 bg-white border border-[#5A5A40]/20 text-[#5A5A40] py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] text-xs sm:text-sm font-sans font-black uppercase tracking-[0.3em] hover:bg-[#F5F2ED] transition-all cursor-pointer"
                 >
                   Exit Game
                 </button>
                 <button 
                   onClick={() => window.location.reload()} 
-                  className="shimmer-effect flex-1 bg-[#5A5A40] text-white py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] text-xs sm:text-sm font-sans font-black uppercase tracking-[0.3em] shadow-2xl shadow-[#5A5A40]/30 transition-all hover:scale-105 active:scale-95 cursor-pointer"
+                  className="shimmer-effect flex-1 bg-[#5A5A40] text-white py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] text-xs sm:text-sm font-sans font-black uppercase tracking-[0.3em] shadow-xl shadow-[#5A5A40]/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   Play Again
                 </button>
