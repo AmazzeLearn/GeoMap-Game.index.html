@@ -998,9 +998,9 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
                             icon={L.divIcon({
                               className: 'atlas-marker-icon',
                               html: `<div class="relative w-14 h-14 flex items-center justify-center">
-                                <div class="absolute inset-0 rounded-full border border-white/30 marker-orbit"></div>
-                                <div class="absolute inset-3 rounded-full border border-white/20"></div>
-                                <div class="relative w-9 h-9 rounded-full border-2 border-white flex items-center justify-center transition-all marker-premium-glow ${gameState.selectedMarkerId === m.id ? (m.id === currentMarker.id ? 'bg-green-500 scale-125 shadow-[0_0_50px_rgba(34,197,94,0.9)]' : 'bg-red-500 scale-125 shadow-[0_0_50px_rgba(239,68,68,0.9)]') : 'bg-white/20 hover:bg-white/50 backdrop-blur-sm'}">
+                                <div class="absolute inset-0 rounded-full border-2 border-[#5A5A40]/60 marker-orbit"></div>
+                                <div class="absolute inset-3 rounded-full border-2 border-[#5A5A40]/40"></div>
+                                <div class="relative w-9 h-9 rounded-full border-2 border-white flex items-center justify-center transition-all marker-premium-glow ${gameState.selectedMarkerId === m.id ? (m.id === currentMarker.id ? 'bg-green-500 scale-125 shadow-[0_0_50px_rgba(34,197,94,0.9)]' : 'bg-red-500 scale-125 shadow-[0_0_50px_rgba(239,68,68,0.9)]') : 'bg-[#5A5A40] hover:bg-[#2C2C2E] shadow-xl'}">
                                   ${gameState.selectedMarkerId === m.id ? (m.id === currentMarker.id ? '<svg viewBox="0 0 24 24" class="w-5 h-5 text-white"><polyline points="20 6 9 17 4 12" stroke-width="4" stroke="currentColor" fill="none"/></svg>' : '<svg viewBox="0 0 24 24" class="w-5 h-5 text-white"><line x1="18" y1="6" x2="6" y2="18" stroke-width="4" stroke="currentColor"/><line x1="6" y1="6" x2="18" y2="18" stroke-width="4" stroke="currentColor"/></svg>') : '<div class="w-2 h-2 bg-white rounded-full shadow-[0_0_10px_white]"></div>'}
                                 </div>
                               </div>`
@@ -1039,8 +1039,8 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
                         >
                           <div className={`relative w-14 h-14 flex items-center justify-center`}>
                             {/* Orbiting Ring */}
-                            <div className={`absolute inset-0 rounded-full border border-white/30 marker-orbit ${gameState.selectedMarkerId === m.id ? 'hidden' : ''}`}></div>
-                            <div className={`absolute inset-3 rounded-full border border-white/20 ${gameState.selectedMarkerId === m.id ? 'hidden' : ''}`}></div>
+                            <div className={`absolute inset-0 rounded-full border-2 border-white/60 marker-orbit ${gameState.selectedMarkerId === m.id ? 'hidden' : ''}`}></div>
+                            <div className={`absolute inset-3 rounded-full border-2 border-white/40 ${gameState.selectedMarkerId === m.id ? 'hidden' : ''}`}></div>
                             
                             {/* Main Pointer */}
                             <div className={`relative w-9 h-9 rounded-full border-2 flex items-center justify-center transition-all ${
@@ -1048,7 +1048,7 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
                                 ? m.id === currentMarker.id 
                                   ? 'bg-green-500 border-white scale-125 shadow-[0_0_50px_rgba(34,197,94,0.9)]' 
                                   : 'bg-red-500 border-white scale-125 shadow-[0_0_50px_rgba(239,68,68,0.9)]'
-                                : 'bg-white/20 border-white/50 backdrop-blur-sm marker-premium-glow'
+                                : 'bg-white/40 hover:bg-white/80 border-white backdrop-blur-sm marker-premium-glow shadow-xl'
                             }`}>
                               {gameState.selectedMarkerId === m.id ? (
                                 isCorrect ? <CheckCircle2 size={20} /> : <XCircle size={20} />
