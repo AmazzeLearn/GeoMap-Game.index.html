@@ -24,7 +24,27 @@
   width: 100%;
   height: 100%;
   border-radius: 1.5rem;
-  background: #B3D1FF; /* Water color */
+  background: #E8E5DF; /* Warm atlas water color */
+}
+
+.leaflet-tile {
+  transition: filter 0.8s ease;
+}
+
+.map-mode-light .leaflet-tile {
+  filter: grayscale(0.8) sepia(0.4) hue-rotate(-10deg) saturate(1.2) contrast(1.05) brightness(0.95);
+}
+
+.map-mode-light:hover .leaflet-tile {
+  filter: grayscale(0.4) sepia(0.2) hue-rotate(-5deg) saturate(1.1) contrast(1.05) brightness(0.98);
+}
+
+.map-mode-dark .leaflet-tile {
+  filter: contrast(1.1) brightness(0.8);
+}
+
+.map-mode-dark:hover .leaflet-tile {
+  filter: contrast(1) brightness(1);
 }
 
 /* Custom Leaflet Marker Styling */
@@ -58,6 +78,23 @@
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-premium::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 50%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent);
+  transform: skewX(-20deg);
+  animation: shine 6s infinite;
+}
+
+@keyframes shine {
+  0%, 100% { left: -100%; }
+  20% { left: 200%; }
 }
 
 .text-premium-gradient {
@@ -100,4 +137,64 @@
     transparent
   );
   animation: shimmer 2s infinite;
+}
+
+/* Modern Web Enhancements */
+.bg-noise {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  pointer-events: none;
+}
+
+.bento-card {
+  position: relative;
+  background: #FFFFFF;
+  border-radius: 2.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.02);
+  transition: all 0.5s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.bento-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 25px 50px -12px rgba(90, 90, 64, 0.2);
+  border-color: rgba(90, 90, 64, 0.15);
+}
+
+.ambient-mesh {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.ambient-mesh::before, .ambient-mesh::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(120px);
+  animation: float 20s infinite ease-in-out;
+  opacity: 0.15;
+}
+
+.ambient-mesh::before {
+  top: -10%; left: -10%;
+  width: 60vw; height: 60vw;
+  background: #5A5A40;
+}
+
+.ambient-mesh::after {
+  bottom: -20%; right: -10%;
+  width: 50vw; height: 50vw;
+  background: #A0B090;
+  animation-delay: -10s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(5%, 5%) scale(1.05); }
+  66% { transform: translate(-2%, 8%) scale(0.95); }
 }

@@ -5,6 +5,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import Typewriter from 'typewriter-effect';
 import { 
   Plus, 
   Trash2, 
@@ -174,7 +175,9 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F2ED] text-[#2C2C2E] font-serif selection:bg-[#5A5A40]/20">
+    <div className="min-h-screen bg-[#F5F2ED] text-[#2C2C2E] font-serif selection:bg-[#5A5A40]/20 relative">
+      <div className="bg-noise" />
+      <div className="ambient-mesh" />
       <AnimatePresence mode="wait">
         {view === 'home' && (
           <motion.div
@@ -182,40 +185,83 @@ export default function App() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="max-w-6xl mx-auto px-8 py-16"
+            className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 py-20 lg:py-32 relative z-10"
           >
-            <header className="mb-16 md:mb-24 text-center">
-              <div className="inline-flex items-center gap-2 md:gap-3 mb-6 md:mb-8 px-4 md:px-6 py-1.5 md:py-2 bg-white border border-[#5A5A40]/10 rounded-full text-[#5A5A40] text-[9px] md:text-[10px] font-black tracking-[0.3em] md:tracking-[0.4em] uppercase shadow-sm">
-                <Globe size={14} />
+            <header className="mb-20 md:mb-32 text-center relative">
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="inline-flex items-center gap-2 md:gap-3 mb-6 md:mb-10 px-5 border border-[#5A5A40]/10 rounded-full text-[#5A5A40] text-[10px] font-black tracking-[0.4em] uppercase shadow-sm bg-white/50 backdrop-blur-md py-2"
+              >
+                <Globe size={14} className="animate-[draw-orbit_10s_linear_infinite]" />
                 MapMaster Atlas
-              </div>
-              <h1 className="text-6xl sm:text-7xl md:text-9xl font-display font-bold italic tracking-tighter mb-6 md:mb-8 leading-[0.9] text-[#2C2C2E]">
+              </motion.div>
+              <motion.h1 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+                className="text-6xl sm:text-8xl md:text-[11rem] font-display font-bold italic tracking-tighter mb-8 md:mb-10 leading-[0.85] text-[#2C2C2E] drop-shadow-sm"
+              >
                 Chart the <br />
-                <span className="text-[#5A5A40]/30 selection:text-[#5A5A40]">Unknown.</span>
-              </h1>
-              <p className="text-lg sm:text-xl md:text-2xl text-[#2C2C2E]/50 max-w-2xl mx-auto font-serif italic leading-relaxed px-4">
+                <span className="text-[#5A5A40]/40 selection:text-[#5A5A40] relative inline-block">
+                  <Typewriter
+                    options={{
+                      strings: ['Unknown.', 'Depths.', 'World.', 'Territory.'],
+                      autoStart: true,
+                      loop: true,
+                      delay: 80,
+                      deleteSpeed: 40,
+                    }}
+                  />
+                  <div className="absolute inset-x-0 bottom-1/4 h-8 bg-gradient-to-r from-transparent via-white/50 to-transparent blur-xl mix-blend-overlay -z-10" />
+                </span>
+              </motion.h1>
+              <motion.p 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 0.3 }}
+                className="text-xl sm:text-2xl md:text-3xl text-[#2C2C2E]/60 max-w-3xl mx-auto font-serif italic leading-relaxed px-4"
+              >
                 From ancient history to modern biological diagrams, create concept-driven interactive maps that bridge the gap between vision and knowledge.
-              </p>
+              </motion.p>
               
-              <div className="mt-12 md:mt-16 flex flex-col sm:flex-row justify-center gap-4 md:gap-6 px-4">
+              <motion.div 
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="mt-16 md:mt-24 flex flex-col sm:flex-row justify-center gap-4 md:gap-6 px-4"
+              >
                 <button
                   onClick={() => handleCreateNew('atlas')}
-                  className="shimmer-effect flex items-center justify-center gap-3 bg-[#5A5A40] text-white px-8 md:px-10 py-4 md:py-5 rounded-[1.5rem] hover:bg-[#4A4A30] transition-all active:scale-95 shadow-[0_20px_50px_rgba(90,90,64,0.3)] font-sans font-black uppercase tracking-widest text-[10px] md:text-xs"
+                  className="shimmer-effect group relative flex items-center justify-center gap-4 bg-[#2C2C2E] text-white px-8 md:px-12 py-5 sm:py-6 rounded-full transition-all active:scale-95 shadow-[0_20px_50px_rgba(44,44,46,0.3)] hover:shadow-[0_25px_60px_rgba(44,44,46,0.5)] font-sans font-black uppercase tracking-widest text-[10px] md:text-xs overflow-hidden cursor-pointer"
                 >
-                  <Plus size={18} />
-                  New Geographic Atlas
+                  <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover:translate-y-[0%] transition-transform duration-500 ease-out" />
+                  <Plus size={18} className="relative z-10 transition-transform group-hover:rotate-90 duration-500" />
+                  <span className="relative z-10">Create Map</span>
                 </button>
                 <button
                   onClick={() => handleCreateNew('image')}
-                  className="flex items-center justify-center gap-3 bg-white border border-[#5A5A40]/20 text-[#5A5A40] px-8 md:px-10 py-4 md:py-5 rounded-[1.5rem] hover:bg-white hover:border-[#5A5A40] transition-all active:scale-95 shadow-lg shadow-black/[0.02] font-sans font-black uppercase tracking-widest text-[10px] md:text-xs"
+                  className="flex items-center justify-center gap-4 bg-white/80 backdrop-blur-xl border border-white text-[#2C2C2E] px-8 md:px-12 py-5 sm:py-6 rounded-full hover:bg-white transition-all active:scale-95 shadow-xl shadow-black/[0.03] hover:shadow-2xl hover:shadow-black/[0.05] font-sans font-black uppercase tracking-widest text-[10px] md:text-xs group cursor-pointer"
                 >
-                  <ImageIcon size={18} />
-                  New Diagram Activity
+                  <ImageIcon size={18} className="transition-transform group-hover:scale-110 duration-500" />
+                  Create Diagram
                 </button>
-              </div>
+              </motion.div>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <motion.div 
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: {
+                  opacity: 1,
+                  transition: { staggerChildren: 0.15, delayChildren: 0.5 }
+                }
+              }}
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10"
+            >
               {quizzes.map((quiz) => (
                 <QuizCard 
                   key={quiz.id} 
@@ -225,7 +271,7 @@ export default function App() {
                   onDelete={() => handleDelete(quiz.id)}
                 />
               ))}
-            </div>
+            </motion.div>
           </motion.div>
         )}
 
@@ -268,55 +314,57 @@ function QuizCard({ quiz, onEdit, onPlay, onDelete }: {
 }) {
   return (
     <motion.div
-      whileHover={{ y: -12 }}
-      className="bg-white rounded-[2.5rem] border border-[#5A5A40]/10 p-7 shadow-sm hover:shadow-2xl hover:shadow-[#5A5A40]/15 transition-all flex flex-col group relative overflow-hidden"
+      variants={{
+        hidden: { opacity: 0, y: 50 },
+        visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] } }
+      }}
+      className="bento-card p-6 md:p-8 flex flex-col group"
     >
-      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#5A5A40]/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-white to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
       
-      <div className="relative aspect-[4/3] rounded-3xl overflow-hidden mb-8 bg-[#F5F2ED] group-hover:shadow-inner transition-shadow">
+      <div className="relative aspect-[4/3] rounded-[2rem] overflow-hidden mb-8 bg-[#F5F2ED] group-hover:shadow-[inset_0_4px_20px_rgba(0,0,0,0.1)] transition-all duration-700">
         {quiz.type === 'atlas' ? (
-          <div className="w-full h-full relative flex items-center justify-center bg-indigo-50/30">
+          <div className="w-full h-full relative flex items-center justify-center bg-indigo-50/50">
             {quiz.imageUrl ? (
               <img 
                 src={quiz.imageUrl} 
                 alt={quiz.title} 
-                className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale-[0.8] group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100 mix-blend-multiply"
+                className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale-[0.8] group-hover:grayscale-[0.2] transition-all duration-1000 scale-105 group-hover:scale-100 mix-blend-multiply"
                 referrerPolicy="no-referrer"
               />
             ) : null}
-            <Globe size={56} className="text-[#5A5A40]/30 group-hover:scale-110 group-hover:text-indigo-400 transition-all duration-700 relative z-10 drop-shadow-xl" />
-            <div className="absolute inset-0 bg-gradient-to-br from-[#5A5A40]/10 via-transparent to-[#5A5A40]/20 mix-blend-overlay" />
+            <Globe size={64} className="text-indigo-400 group-hover:scale-110 group-hover:text-indigo-500 transition-all duration-1000 relative z-10 drop-shadow-[0_20px_40px_rgba(99,102,241,0.5)] opacity-50 group-hover:opacity-100" />
+            <div className="absolute inset-0 bg-gradient-to-br from-black/10 via-transparent to-black/30 mix-blend-overlay" />
           </div>
         ) : (
           <img 
             src={quiz.imageUrl} 
             alt={quiz.title} 
-            className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-700 scale-105 group-hover:scale-100"
+            className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100"
             referrerPolicy="no-referrer"
           />
         )}
-        <div className="absolute top-5 right-5 flex gap-2">
+        <div className="absolute top-4 right-4 flex gap-2">
            <button 
             onClick={(e) => { e.stopPropagation(); onDelete(); }}
-            className="p-3 bg-white/80 backdrop-blur-xl rounded-full text-red-400 hover:bg-red-500 hover:text-white transition-all shadow-lg border border-white/20"
+            className="p-3 bg-white/40 backdrop-blur-md rounded-full text-[#2C2C2E] hover:bg-black hover:text-white transition-all duration-300 shadow-xl border border-white/20 cursor-pointer"
           >
             <Trash2 size={16} />
           </button>
         </div>
-        <div className="absolute bottom-5 left-5 bg-white/80 backdrop-blur-xl px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.3em] text-[#5A5A40] border border-white/20 shadow-sm">
-           {quiz.type === 'atlas' ? 'Cartographic' : 'Diagram'}
+        <div className="absolute bottom-4 left-4 bg-white/40 backdrop-blur-md px-4 py-2 rounded-full text-[9px] font-black uppercase tracking-[0.4em] text-[#2C2C2E] shadow-xl border border-white/20">
+           {quiz.type === 'atlas' ? 'Map Format' : 'Diagram'}
         </div>
       </div>
       
-      <h3 className="text-3xl font-display font-bold italic mb-4 text-[#2C2C2E] group-hover:text-black transition-colors">{quiz.title}</h3>
+      <h3 className="text-3xl md:text-4xl font-display font-bold italic mb-6 text-[#2C2C2E] line-clamp-2 leading-tight">{quiz.title}</h3>
       
       <div className="flex items-center gap-5 mb-10">
-        <div className="flex items-center gap-2 text-xs text-[#5A5A40]/50 font-sans font-bold uppercase tracking-widest">
-          <BookOpen size={14} className="opacity-60" />
-          <span>{quiz.markers.length} Insights</span>
+        <div className="flex items-center gap-2 text-xs text-[#2C2C2E]/60 font-sans font-bold uppercase tracking-[0.2em] bg-[#F5F2ED] px-4 py-1.5 rounded-full">
+          <BookOpen size={14} className="opacity-80" />
+          <span>{quiz.markers.length} Locations</span>
         </div>
-        <div className="w-1 h-1 rounded-full bg-[#5A5A40]/20" />
-        <div className="px-3 py-1 rounded-full bg-[#5A5A40]/5 text-[#5A5A40] text-[10px] font-black uppercase tracking-widest border border-[#5A5A40]/10">
+        <div className="px-4 py-1.5 rounded-full bg-indigo-50 text-indigo-700 text-[10px] font-black uppercase tracking-[0.3em]">
           {quiz.difficulty}
         </div>
       </div>
@@ -324,17 +372,18 @@ function QuizCard({ quiz, onEdit, onPlay, onDelete }: {
       <div className="mt-auto grid grid-cols-2 gap-4">
         <button
           onClick={onEdit}
-          className="flex items-center justify-center gap-2 py-4 px-4 bg-[#F5F2ED] text-[#5A5A40] rounded-[1.25rem] hover:bg-[#5A5A40]/10 transition-all font-sans font-black uppercase tracking-widest text-[10px] border border-[#5A5A40]/5"
+          className="group/btn flex items-center justify-center gap-2 py-4 xl:py-5 px-4 bg-transparent text-[#2C2C2E] rounded-full hover:bg-[#F5F2ED] transition-all duration-300 font-sans font-black uppercase tracking-[0.25em] text-[10px] border border-[#2C2C2E]/10 hover:border-[#2C2C2E]/20 cursor-pointer"
         >
-          <Settings size={16} />
-          Configure
+          <Settings size={16} className="group-hover/btn:rotate-90 transition-transform duration-500" />
+          Edit Map
         </button>
         <button
           onClick={onPlay}
-          className="shimmer-effect flex items-center justify-center gap-2 py-4 px-4 bg-[#5A5A40] text-white rounded-[1.25rem] hover:bg-[#4A4A30] transition-all active:scale-95 shadow-xl shadow-[#5A5A40]/20 font-sans font-black uppercase tracking-widest text-[10px]"
+          className="group/btn relative overflow-hidden flex items-center justify-center gap-2 py-4 xl:py-5 px-4 bg-black text-white rounded-full transition-all duration-300 active:scale-95 shadow-[0_15px_30px_rgba(0,0,0,0.2)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.3)] font-sans font-black uppercase tracking-[0.25em] text-[10px] cursor-pointer"
         >
-          <Play size={16} fill="white" />
-          Venture
+          <div className="absolute inset-0 bg-white/20 translate-y-[100%] group-hover/btn:translate-y-[0%] transition-transform duration-500 ease-out" />
+          <Play size={16} fill="white" className="relative z-10 group-hover/btn:scale-110 transition-transform duration-500" />
+          <span className="relative z-10">Play Map</span>
         </button>
       </div>
     </motion.div>
@@ -492,15 +541,15 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
         <div className="p-6 md:p-10 pb-4 md:pb-6">
           <button 
             onClick={onBack}
-            className="flex items-center gap-2 md:gap-3 text-[10px] text-[#5A5A40]/40 hover:text-[#5A5A40] mb-6 md:mb-12 transition-all font-sans font-black uppercase tracking-[0.4em]"
+            className="flex items-center gap-2 md:gap-3 text-[10px] text-[#5A5A40]/40 hover:text-[#5A5A40] mb-6 md:mb-12 transition-all font-sans font-black uppercase tracking-[0.4em] cursor-pointer"
           >
             <ChevronLeft size={16} />
-            Imperial Dashboard
+            Back to Dashboard
           </button>
           
           <div className="space-y-8">
             <div>
-              <label className="text-[10px] uppercase tracking-[0.4em] font-black text-[#5A5A40] mb-3 block">Manuscript Title</label>
+              <label className="text-[10px] uppercase tracking-[0.4em] font-black text-[#5A5A40] mb-3 block">Map Title</label>
               <input 
                 value={formData.title}
                 onChange={e => setFormData({ ...formData, title: e.target.value })}
@@ -647,10 +696,10 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
         <div className="p-6 md:p-8 border-t border-[#5A5A40]/10 bg-white shrink-0">
           <button
             onClick={() => onSave(formData)}
-            className="w-full flex items-center justify-center gap-3 bg-[#5A5A40] text-white py-3 md:py-4 rounded-2xl hover:bg-[#4A4A30] transition-all active:scale-[0.98] shadow-2xl shadow-[#5A5A40]/20 font-sans font-bold text-sm md:text-base"
+            className="w-full flex items-center justify-center gap-3 bg-[#5A5A40] text-white py-3 md:py-4 rounded-2xl hover:bg-[#4A4A30] transition-all active:scale-[0.98] shadow-2xl shadow-[#5A5A40]/20 font-sans font-bold text-sm md:text-base cursor-pointer"
           >
             <Save size={20} />
-            Commit to Atlas
+            Save Map
           </button>
         </div>
       </div>
@@ -659,8 +708,8 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
       <div className="flex-1 bg-white p-4 md:p-8 flex flex-col relative overflow-hidden">
         <div className="bg-[#F5F2ED] rounded-[2rem] md:rounded-[3rem] shadow-2xl shadow-[#5A5A40]/10 overflow-hidden flex-1 relative flex items-center justify-center border-4 md:border-8 border-white p-2 md:p-4">
           {formData.type === 'atlas' ? (
-            <MapContainer center={[20, 78]} zoom={4} zoomControl={false} className="z-10 bg-blue-50 w-full h-full rounded-[2rem]">
-              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            <MapContainer center={[20, 78]} zoom={4} zoomControl={false} className="z-10 bg-[#E8E5DF] w-full h-full rounded-[2rem] map-mode-light">
+              <TileLayer url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png" />
               <MapEvents />
               {formData.markers.map(m => (
                 m.lat !== undefined && m.lng !== undefined && (
@@ -725,15 +774,15 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
               className="absolute inset-x-4 bottom-4 lg:inset-auto lg:right-16 lg:top-16 lg:bottom-16 max-h-[50vh] lg:max-h-none lg:w-96 glass-premium border border-white/5 rounded-[2rem] lg:rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.4)] p-6 lg:p-10 space-y-6 lg:space-y-8 z-50 flex flex-col bg-[#2C2C2E]/90 lg:bg-transparent"
             >
               <div className="flex justify-between items-center pb-4 lg:pb-6 border-b border-white/10 lg:border-white/5 shrink-0">
-                <h4 className="font-display italic font-bold text-2xl lg:text-3xl text-premium-gradient">Insight #{formData.markers.indexOf(activeMarker) + 1}</h4>
-                <button onClick={() => setSelectedMarkerId(null)} className="p-2 text-white/50 hover:text-white transition-colors">
+                <h4 className="font-display italic font-bold text-2xl lg:text-3xl text-premium-gradient">Location #{formData.markers.indexOf(activeMarker) + 1}</h4>
+                <button onClick={() => setSelectedMarkerId(null)} className="p-2 text-white/50 hover:text-white transition-colors cursor-pointer">
                    <XCircle size={24} />
                 </button>
               </div>
               
               <div className="flex-1 overflow-y-auto space-y-6 lg:space-y-8 pr-2 custom-scrollbar">
                 <div>
-                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-black text-[#5A5A40] lg:text-[#F5F2ED] mb-2 block">Nomen (Label)</label>
+                  <label className="text-[9px] lg:text-[10px] uppercase tracking-[0.3em] lg:tracking-[0.4em] font-black text-[#5A5A40] lg:text-[#F5F2ED] mb-2 block">Name / Label</label>
                   <input 
                     value={activeMarker.name}
                     onChange={e => updateMarker(activeMarker.id, { name: e.target.value })}
@@ -742,16 +791,16 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase tracking-[0.4em] font-black text-[#5A5A40] mb-3 block">Hint / Concept</label>
+                  <label className="text-[10px] uppercase tracking-[0.4em] font-black text-[#5A5A40] mb-3 block">Description / Hint</label>
                   <textarea 
                     value={activeMarker.description}
                     onChange={e => updateMarker(activeMarker.id, { description: e.target.value })}
                     className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm font-serif h-36 resize-none text-white/70 focus:ring-2 focus:ring-[#5A5A40] outline-none transition-all"
-                    placeholder="Describe the essence..."
+                    placeholder="Provide a hint or description..."
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] uppercase tracking-[0.4em] font-black text-[#5A5A40] mb-3 block">Revelation (Success)</label>
+                  <label className="text-[10px] uppercase tracking-[0.4em] font-black text-[#5A5A40] mb-3 block">Success Feedback</label>
                   <textarea 
                     value={activeMarker.feedback}
                     onChange={e => updateMarker(activeMarker.id, { feedback: e.target.value })}
@@ -764,9 +813,9 @@ function Editor({ quiz, onBack, onSave }: { quiz: QuizConfig; onBack: () => void
               <div className="pt-6 border-t border-[#5A5A40]/10">
                 <button 
                   onClick={() => deleteMarker(activeMarker.id)}
-                  className="w-full py-4 text-red-500 font-sans font-bold uppercase tracking-widest text-xs hover:bg-red-50 rounded-2xl transition-all"
+                  className="w-full py-4 text-red-500 font-sans font-bold uppercase tracking-widest text-xs hover:bg-red-50 rounded-2xl transition-all cursor-pointer"
                 >
-                  Omit Insight
+                  Delete Location
                 </button>
               </div>
             </motion.div>
@@ -895,7 +944,7 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
           <div className="w-px h-6 bg-white/10 shrink-0" />
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <p className="text-[8px] sm:text-[10px] text-white/30 uppercase font-black tracking-[0.2em] sm:tracking-[0.4em]">Scholarship</p>
+            <p className="text-[8px] sm:text-[10px] text-white/30 uppercase font-black tracking-[0.2em] sm:tracking-[0.4em]">Score</p>
             <p className="font-mono text-sm sm:text-xl leading-none text-premium-gradient">{gameState.score}</p>
           </div>
         </div>
@@ -917,7 +966,7 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
               exit={{ opacity: 0, scale: 1.1 }}
               className="z-50 text-center max-w-4xl px-4"
             >
-              <h2 className="text-4xl md:text-6xl lg:text-8xl font-display font-bold italic mb-6 sm:mb-8 drop-shadow-2xl leading-tight">{quiz.title}</h2>
+                 <h2 className="text-4xl md:text-6xl lg:text-8xl font-display font-bold italic mb-6 sm:mb-8 drop-shadow-2xl leading-tight">{quiz.title}</h2>
               <div className="flex flex-col sm:flex-row justify-center gap-3 md:gap-4 mb-10 sm:mb-14">
                  <div className="px-4 md:px-6 py-3 bg-white/5 border border-white/10 rounded-full text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] flex items-center justify-center gap-2">
                    <Navigation size={16} />
@@ -930,9 +979,9 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
               </div>
               <button
                 onClick={() => setGameState(prev => ({ ...prev, status: 'playing' }))}
-                className="group relative inline-flex items-center gap-4 sm:gap-6 bg-[#F5F2ED] text-[#2C2C2E] px-10 sm:px-16 py-5 sm:py-7 rounded-full font-sans font-black text-lg sm:text-2xl hover:scale-105 transition-all shadow-[0_0_60px_rgba(245,242,237,0.15)]"
+                className="group relative inline-flex items-center gap-4 sm:gap-6 bg-[#F5F2ED] text-[#2C2C2E] px-10 sm:px-16 py-5 sm:py-7 rounded-full font-sans font-black text-lg sm:text-2xl hover:scale-105 transition-all shadow-[0_0_60px_rgba(245,242,237,0.15)] cursor-pointer"
               >
-                Inaugurate Journey
+                Start Exploration
                 <Play size={20} className="sm:w-7 sm:h-7 group-hover:translate-x-2 transition-transform" fill="currentColor" />
               </button>
             </motion.div>
@@ -949,8 +998,8 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
               <div className="flex-none lg:flex-1 relative bg-black flex items-center justify-center overflow-hidden h-[45vh] sm:h-[50vh] lg:h-auto shrink-0 border-b border-white/10 lg:border-b-0 lg:border-r">
                 <div className="absolute inset-0 z-0 p-4 lg:p-8 flex items-center justify-center">
                   {quiz.type === 'atlas' ? (
-                    <MapContainer center={[30, 80]} zoom={4} zoomControl={false} className="w-full h-full rounded-[2rem] border-4 border-white/5">
-                      <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png" />
+                    <MapContainer center={[30, 80]} zoom={4} zoomControl={false} className="w-full h-full rounded-[2rem] border-4 border-white/5 bg-[#141414] map-mode-dark">
+                      <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png" />
                       {quiz.markers.map(m => (
                         m.lat !== undefined && m.lng !== undefined && (
                           <LeafletMarker 
@@ -1038,7 +1087,7 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
               {/* Info Sidebar - Right */}
               <div className="w-full lg:w-[420px] glass-premium lg:border-l border-white/5 p-6 md:p-10 flex flex-col gap-8 md:gap-10 shrink-0 bg-[#0A0A0B]/80 lg:bg-transparent lg:overflow-y-auto border-t lg:border-t-0 flex-none pb-12 lg:pb-10">
                 <div className="space-y-4 md:space-y-6">
-                   <p className="text-[#5A5A40] text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] md:tracking-[0.6em]">Active Mandate</p>
+                   <p className="text-[#5A5A40] text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] md:tracking-[0.6em]">Find Location</p>
                    <h3 className="text-4xl md:text-5xl font-display font-bold italic text-white leading-tight break-words text-premium-gradient">{currentMarker?.name}</h3>
                    {currentMarker?.description && (
                      <div className="text-white/50 text-lg md:text-xl font-serif italic flex items-start gap-3 md:gap-4 glass-premium p-4 md:p-6 rounded-[2rem] md:rounded-[2.5rem] border border-white/5">
@@ -1058,15 +1107,15 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
                     >
                        <div>
                           <p className={`font-display font-bold italic text-2xl mb-1 ${isCorrect ? 'text-green-400' : 'text-red-400'}`}>
-                            {isCorrect ? 'Magnificent.' : 'Misdirected.'}
+                            {isCorrect ? 'Correct!' : 'Incorrect.'}
                           </p>
-                          <p className="text-white/50 text-sm italic leading-relaxed">{isCorrect ? (currentMarker.feedback || 'Accurate coordination.') : 'Incorrect territory detected.'}</p>
+                          <p className="text-white/50 text-sm italic leading-relaxed">{isCorrect ? (currentMarker.feedback || 'Great job finding this location.') : 'That is not the current target.'}</p>
                        </div>
                        <button
                          onClick={handleNext}
-                         className={`w-full py-4 rounded-2xl font-sans font-black uppercase tracking-widest text-xs transition-all active:scale-95 shadow-2xl ${isCorrect ? 'bg-green-500 text-white shadow-green-500/20' : 'bg-red-500 text-white shadow-red-500/20'}`}
+                         className={`w-full py-4 rounded-2xl font-sans font-black uppercase tracking-widest text-xs transition-all active:scale-95 shadow-2xl cursor-pointer ${isCorrect ? 'bg-green-500 text-white shadow-green-500/20' : 'bg-red-500 text-white shadow-red-500/20'}`}
                        >
-                         {gameState.currentMarkerIndex >= shuffledMarkers.length - 1 ? 'Conclude Mission' : 'Proceed to Next'}
+                         {gameState.currentMarkerIndex >= shuffledMarkers.length - 1 ? 'Finish Game' : 'Proceed to Next'}
                        </button>
                     </motion.div>
                   )}
@@ -1074,7 +1123,7 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
 
                 <div className="mt-auto pt-8 border-t border-white/5">
                   <div className="flex justify-between text-[10px] uppercase font-bold tracking-widest text-white/20 mb-2">
-                    <span>Expedition Progress</span>
+                    <span>Progress</span>
                     <span>{gameState.currentMarkerIndex} / {quiz.markers.length}</span>
                   </div>
                   <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
@@ -1102,15 +1151,15 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
                 </div>
                 
                 <h2 className="text-4xl sm:text-6xl md:text-8xl font-display font-bold italic mb-4 sm:mb-6 text-premium-gradient">
-                  {gameState.status === 'success' ? 'Legendary.' : 'Fallen.'}
+                  {gameState.status === 'success' ? 'Success!' : 'Game Over.'}
                 </h2>
                 <p className="text-white/40 text-lg sm:text-2xl italic font-serif mb-8 sm:mb-12 px-4 sm:px-0">
-                  {gameState.status === 'success' ? `You have mapped all ${quiz.markers.length} territories.` : 'The journey has exceeded your endurance limit.'}
+                  {gameState.status === 'success' ? `You correctly found all ${quiz.markers.length} locations.` : 'You have run out of lives.'}
                 </p>
 
               <div className="grid grid-cols-2 gap-4 sm:gap-10 mb-8 sm:mb-12">
                 <div className="text-center p-4 sm:p-8 glass-premium rounded-3xl sm:rounded-[2.5rem] border border-white/5">
-                   <p className="text-[8px] sm:text-[10px] text-[#5A5A40] uppercase font-black tracking-[0.2em] sm:tracking-[0.4em] mb-2">Scholarship</p>
+                   <p className="text-[8px] sm:text-[10px] text-[#5A5A40] uppercase font-black tracking-[0.2em] sm:tracking-[0.4em] mb-2">Score</p>
                    <p className="font-mono text-3xl sm:text-5xl font-bold text-premium-gradient">{gameState.score}</p>
                 </div>
                 <div className="text-center p-4 sm:p-8 glass-premium rounded-3xl sm:rounded-[2.5rem] border border-white/5">
@@ -1124,15 +1173,15 @@ function Player({ quiz, onBack }: { quiz: QuizConfig; onBack: () => void; key?: 
               <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
                 <button 
                   onClick={onBack} 
-                  className="flex-1 bg-white/5 border border-white/10 text-white/60 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] text-xs sm:text-sm font-sans font-black uppercase tracking-[0.3em] hover:bg-white/10 transition-all"
+                  className="flex-1 bg-white/5 border border-white/10 text-white/60 py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] text-xs sm:text-sm font-sans font-black uppercase tracking-[0.3em] hover:bg-white/10 transition-all cursor-pointer"
                 >
-                  Retire
+                  Exit Game
                 </button>
                 <button 
                   onClick={() => window.location.reload()} 
-                  className="shimmer-effect flex-1 bg-[#5A5A40] text-white py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] text-xs sm:text-sm font-sans font-black uppercase tracking-[0.3em] shadow-2xl shadow-[#5A5A40]/30 transition-all hover:scale-105 active:scale-95"
+                  className="shimmer-effect flex-1 bg-[#5A5A40] text-white py-4 sm:py-6 rounded-[1.5rem] sm:rounded-[2rem] text-xs sm:text-sm font-sans font-black uppercase tracking-[0.3em] shadow-2xl shadow-[#5A5A40]/30 transition-all hover:scale-105 active:scale-95 cursor-pointer"
                 >
-                  Relaunch
+                  Play Again
                 </button>
               </div>
             </motion.div>
